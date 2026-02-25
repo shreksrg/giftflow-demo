@@ -1,18 +1,17 @@
 <script setup>
 import { computed } from 'vue'
 
-const props = defineProps(['user', 'currentView'])
-const emit = defineEmits(['navigate', 'logout'])
+const props = defineProps(['user'])
+const emit = defineEmits(['logout'])
 
 const navItems = computed(() => {
   const items = []
   
   if (props.user.role === 'DEPT_ADMIN') {
-    items.push({ id: 'gifts', label: 'Browse Gifts' })
-    items.push({ id: 'dashboard', label: 'My Applications' })
+    items.push({ path: '/gifts', label: 'Browse Gifts' })
+    items.push({ path: '/dashboard', label: 'My Applications' })
   } else {
-    items.push({ id: 'dashboard', label: 'Pending Approvals' })
-    // Approvers can't browse/apply in this version
+    items.push({ path: '/dashboard', label: 'Pending Approvals' })
   }
   return items
 })
@@ -28,19 +27,15 @@ const navItems = computed(() => {
           </div>
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
-              <button
+              <router-link
                 v-for="item in navItems"
-                :key="item.id"
-                @click="emit('navigate', item.id)"
-                :class="[
-                  currentView === item.id 
-                    ? 'bg-indigo-700 text-white' 
-                    : 'text-indigo-200 hover:bg-indigo-500 hover:text-white',
-                  'px-3 py-2 rounded-md text-sm font-medium transition-colors'
-                ]"
+                :key="item.path"
+                :to="item.path"
+                active-class="bg-indigo-700 text-white"
+                class="text-indigo-200 hover:bg-indigo-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 {{ item.label }}
-              </button>
+              </router-link>
             </div>
           </div>
         </div>

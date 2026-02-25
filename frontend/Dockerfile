@@ -12,6 +12,7 @@ RUN npm run build
 # Production Stage
 FROM public.ecr.aws/nginx/nginx:stable-alpine as production-stage
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 EXPOSE 80
