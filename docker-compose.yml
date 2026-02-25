@@ -5,6 +5,8 @@ services:
     container_name: giftflow-backend
     ports:
       - "8080:8080"
+    volumes:
+      - ./backend:/app
     environment:
       - MONGO_URI=mongodb://mongo:27017
       - PORT=8080

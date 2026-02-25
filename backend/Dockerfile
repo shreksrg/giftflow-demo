@@ -1,23 +1,15 @@
-# Build Stage
-FROM golang:1.23-alpine AS builder
+FROM golang:1.23-alpine
 
 WORKDIR /app
+
+# Install Air for hot reload (pin version to avoid Go version mismatch)
+RUN go install github.com/air-verse/air@v1.52.3
 
 COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
-
-# Run Stage
-FROM alpine:latest
-
-RUN apk --no-cache add curl
-
-WORKDIR /root/
-
-COPY --from=builder /app/main .
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["air"]
