@@ -4,13 +4,16 @@ import (
 	"context"
 	"giftFlow/config"
 	"giftFlow/models"
+	"math"
 	"net/http"
+	"strconv"
 
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Seed Mock Data
@@ -58,17 +61,53 @@ func GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// GetGifts returns all gift items
+// GetGifts returns all gift items with pagination
 func GetGifts(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+
+	opts := options.Find()
+	opts.SetSkip(int64((page - 1) * limit))
+	opts.SetLimit(int64(limit))
+
+	collection := config.GetCollection("giftItems")
+
+	// Count total documents
+	total, err := collection.CountDocuments(context.Background(), bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	var gifts []models.GiftItem
-	cursor, err := config.GetCollection("giftItems").Find(context.Background(), bson.M{})
+	cursor, err := collection.Find(context.Background(), bson.M{}, opts)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	defer cursor.Close(context.Background())
-	cursor.All(context.Background(), &gifts)
-	c.JSON(http.StatusOK, gifts)
+
+	if err = cursor.All(context.Background(), &gifts); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":       gifts,
+		"total":      total,
+		"page":       page,
+		"limit":      limit,
+		"totalPages": totalPages,
+	})
 }
 
 // CreateApplication submits a new gift request
@@ -141,9 +180,26 @@ func CreateApplication(c *gin.Context) {
 	c.JSON(http.StatusCreated, app)
 }
 
-// GetApplications returns applications relevant to the user
+// GetApplications returns applications relevant to the user with pagination
 func GetApplications(c *gin.Context) {
 	user := c.MustGet("user").(models.User)
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+
+	opts := options.Find()
+	opts.SetSkip(int64((page - 1) * limit))
+	opts.SetLimit(int64(limit))
+	// Sort by created date desc
+	opts.SetSort(bson.D{{Key: "createdAt", Value: -1}})
+
 	var filter bson.M
 
 	// Role-based filtering
@@ -164,11 +220,19 @@ func GetApplications(c *gin.Context) {
 		filter = bson.M{}
 	}
 
-	cursor, err := config.GetCollection("applications").Find(context.Background(), filter)
+	collection := config.GetCollection("applications")
+	total, err := collection.CountDocuments(context.Background(), filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	cursor, err := collection.Find(context.Background(), filter, opts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer cursor.Close(context.Background())
 
 	var apps []models.Application
 	if err = cursor.All(context.Background(), &apps); err != nil {
@@ -176,7 +240,15 @@ func GetApplications(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, apps)
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":       apps,
+		"total":      total,
+		"page":       page,
+		"limit":      limit,
+		"totalPages": totalPages,
+	})
 }
 
 // UpdateApplicationStatus handles approvals/rejections

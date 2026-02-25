@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-mongo-server"
+      ],
+      "env": {
+        "MCP_MONGODB_URI": "mongodb://localhost:27017/giftflow"
+      }
+    }
+  }
+}

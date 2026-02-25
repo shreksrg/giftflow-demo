@@ -5,14 +5,23 @@ import axios from 'axios'
 const props = defineProps(['user'])
 const applications = ref([])
 const loading = ref(true)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const limit = 10
 
-const fetchApplications = async () => {
+const fetchApplications = async (page = 1) => {
   loading.value = true
   try {
-    const response = await axios.get('http://localhost:8080/api/applications')
-    applications.value = response.data
+    const pageNum = typeof page === 'number' ? page : currentPage.value
+    const response = await axios.get('http://localhost:8080/api/applications', {
+      params: { page: pageNum, limit }
+    })
+    applications.value = response.data.data || []
+    currentPage.value = response.data.page || 1
+    totalPages.value = response.data.totalPages || 1
   } catch (err) {
     console.error(err)
+    alert('Failed to fetch applications: ' + (err.response?.data?.error || err.message))
   } finally {
     loading.value = false
   }
@@ -35,7 +44,7 @@ const updateStatus = async (app, action) => {
       action,
       comment
     })
-    await fetchApplications() // Refresh list
+    await fetchApplications(currentPage.value) // Refresh list
   } catch (err) {
     alert('Failed to update status: ' + (err.response?.data?.error || err.message))
   }
@@ -59,7 +68,7 @@ const statusClass = (status) => {
       <h2 class="text-2xl font-bold text-gray-900">
         {{ user.role === 'DEPT_ADMIN' ? 'My Applications' : 'Approvals Dashboard' }}
       </h2>
-      <button @click="fetchApplications" class="text-sm text-indigo-600 hover:text-indigo-900">
+      <button @click="fetchApplications(currentPage)" class="text-sm text-indigo-600 hover:text-indigo-900">
         Refresh
       </button>
     </div>
@@ -140,6 +149,29 @@ const statusClass = (status) => {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div v-if="!loading && totalPages > 1" class="mt-4 flex justify-between items-center">
+        <span class="text-sm text-gray-700">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
+        <div class="space-x-2">
+          <button 
+            @click="fetchApplications(currentPage - 1)" 
+            :disabled="currentPage === 1"
+            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button 
+            @click="fetchApplications(currentPage + 1)" 
+            :disabled="currentPage === totalPages"
+            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
