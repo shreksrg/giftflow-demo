@@ -26,6 +26,10 @@ const applyForGift = async (gift) => {
       await axios.post('http://localhost:8080/api/applications', {
         giftId: gift.id
       })
+      
+      // Update local stock immediately
+      gift.quantity--
+      
       successMsg.value = `Successfully applied for ${gift.name}!`
       setTimeout(() => successMsg.value = '', 3000)
     } catch (err) {

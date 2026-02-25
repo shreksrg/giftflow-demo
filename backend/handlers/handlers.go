@@ -88,10 +88,30 @@ func CreateApplication(c *gin.Context) {
 	}
 
 	objID, _ := primitive.ObjectIDFromHex(req.GiftID)
-	var gift models.GiftItem
-	err := config.GetCollection("giftItems").FindOne(context.Background(), bson.M{"_id": objID}).Decode(&gift)
+
+	// Check and Decrease Stock atomically
+	// Only proceed if quantity > 0
+	updateResult, err := config.GetCollection("giftItems").UpdateOne(
+		context.Background(),
+		bson.M{"_id": objID, "quantity": bson.M{"$gt": 0}},
+		bson.M{"$inc": bson.M{"quantity": -1}},
+	)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Gift not found"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during stock update"})
+		return
+	}
+	if updateResult.ModifiedCount == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Out of stock or Gift not found"})
+		return
+	}
+
+	// Fetch gift details for the application record (snapshot)
+	var gift models.GiftItem
+	err = config.GetCollection("giftItems").FindOne(context.Background(), bson.M{"_id": objID}).Decode(&gift)
+	if err != nil {
+		// This should theoretically not happen if UpdateOne succeeded, but handle it just in case
+		// Rollback stock if needed, or just log error. For simplicity, we return error.
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching gift details"})
 		return
 	}
 
@@ -188,6 +208,18 @@ func UpdateApplicationStatus(c *gin.Context) {
 	newStatus := app.Status
 
 	if req.Action == "REJECT" {
+		// Only restore stock if we are rejecting a non-rejected application
+		if app.Status != models.StatusRejected && app.Status != models.StatusCompleted {
+			_, err := config.GetCollection("giftItems").UpdateOne(
+				context.Background(),
+				bson.M{"_id": app.GiftID},
+				bson.M{"$inc": bson.M{"quantity": 1}},
+			)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to restore stock"})
+				return
+			}
+		}
 		newStatus = models.StatusRejected
 	} else if req.Action == "APPROVE" {
 		if app.Status == models.StatusPendingHead && user.Role == models.RoleDeptHead {
