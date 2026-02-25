@@ -15,7 +15,7 @@ const fetchGifts = async (page = 1) => {
   loading.value = true
   try {
     const pageNum = typeof page === 'number' ? page : 1
-    const response = await axios.get('http://localhost:8080/api/gifts', {
+    const response = await axios.get('http://127.0.0.1:8080/api/gifts', {
       params: { page: pageNum, limit }
     })
     gifts.value = response.data.data || []
@@ -35,7 +35,7 @@ const applyForGift = async (gift) => {
   if (confirm(`Apply for ${gift.name}?`)) {
     applying.value = gift.id
     try {
-      await axios.post('http://localhost:8080/api/applications', {
+      await axios.post('http://127.0.0.1:8080/api/applications', {
         giftId: gift.id
       })
       

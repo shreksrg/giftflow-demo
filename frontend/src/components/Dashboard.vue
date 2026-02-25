@@ -13,7 +13,7 @@ const fetchApplications = async (page = 1) => {
   loading.value = true
   try {
     const pageNum = typeof page === 'number' ? page : currentPage.value
-    const response = await axios.get('http://localhost:8080/api/applications', {
+    const response = await axios.get('http://127.0.0.1:8080/api/applications', {
       params: { page: pageNum, limit }
     })
     applications.value = response.data.data || []
@@ -36,11 +36,11 @@ const canApprove = (app) => {
 }
 
 const updateStatus = async (app, action) => {
-  const comment = prompt(`Enter comment for ${action}:`)
+  const comment = prompt(`Enter comment for ${action}:`, '') // Default to empty string
   if (comment === null) return // Cancelled
 
   try {
-    await axios.put(`http://localhost:8080/api/applications/${app.id}/status`, {
+    await axios.put(`http://127.0.0.1:8080/api/applications/${app.id}/status`, {
       action,
       comment
     })
@@ -97,6 +97,9 @@ const statusClass = (status) => {
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Comment
+                  </th>
                   <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">Actions</span>
                   </th>
@@ -121,6 +124,9 @@ const statusClass = (status) => {
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {{ new Date(app.createdAt).toLocaleDateString() }}
                   </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate" :title="app.history && app.history.length > 0 ? app.history[app.history.length - 1].comment : ''">
+                    {{ (app.history && app.history.length > 0 && app.history[app.history.length - 1].comment) ? app.history[app.history.length - 1].comment : '--' }}
+                  </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div v-if="canApprove(app)" class="flex justify-end space-x-2">
                       <button 
@@ -142,7 +148,7 @@ const statusClass = (status) => {
                   </td>
                 </tr>
                 <tr v-if="applications.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                     No applications found.
                   </td>
                 </tr>

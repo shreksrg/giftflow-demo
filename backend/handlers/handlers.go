@@ -166,7 +166,7 @@ func CreateApplication(c *gin.Context) {
 				Status:    models.StatusPendingHead,
 				ChangedBy: user.ID,
 				Timestamp: time.Now(),
-				Comment:   "Application submitted",
+				Comment:   "--",
 			},
 		},
 	}
