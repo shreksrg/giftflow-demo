@@ -12,6 +12,9 @@ const navItems = computed(() => {
     items.push({ path: '/dashboard', label: 'My Applications' })
   } else {
     items.push({ path: '/dashboard', label: 'Pending Approvals' })
+    if (props.user.role === 'CPRO_ADMIN') {
+      items.push({ path: '/gift-management', label: 'Manage Gifts' })
+    }
   }
   return items
 })

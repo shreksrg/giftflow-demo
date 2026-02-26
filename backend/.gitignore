@@ -1,0 +1,36 @@
+# Binaries
+giftFlow
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Coverage
+*.out
+
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+tmp/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Python scripts (dev tools)
+*.py
+__pycache__/

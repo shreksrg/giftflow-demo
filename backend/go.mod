@@ -1,6 +1,6 @@
-module giftFlow
+module giftflow
 
-go 1.23.4
+go 1.26
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect

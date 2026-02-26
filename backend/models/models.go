@@ -21,11 +21,12 @@ const (
 
 // Application Status constants
 const (
-	StatusPendingHead = "PENDING_HEAD"
+	StatusPendingHead  = "PENDING_HEAD"
 	StatusApprovedHead = "APPROVED_HEAD"
 	StatusPendingCpro  = "PENDING_CPRO"
 	StatusApprovedCpro = "APPROVED_CPRO"
-	StatusRejected     = "REJECTED"
+	StatusRejectedHead = "REJECT_HEAD"
+	StatusRejectedCpro = "REJECT_CPRO"
 	StatusCompleted    = "COMPLETED"
 )
 
@@ -45,6 +46,7 @@ type GiftItem struct {
 	ImageURL    string             `json:"imageUrl" bson:"imageUrl"`
 	Type        string             `json:"type" bson:"type"` // NORMAL or VIP
 	Quantity    int                `json:"quantity" bson:"quantity"`
+	IsPublished bool               `json:"isPublished" bson:"isPublished"`
 }
 
 // Application represents a gift request
@@ -53,6 +55,8 @@ type Application struct {
 	ApplicantID string             `json:"applicantId" bson:"applicantId"` // User ID
 	GiftID      primitive.ObjectID `json:"giftId" bson:"giftId"`
 	GiftName    string             `json:"giftName" bson:"giftName"` // Denormalized for display
+	ImageURL    string             `json:"imageUrl" bson:"imageUrl"` // Denormalized for display
+	Quantity    int                `json:"quantity" bson:"quantity"`
 	Status      string             `json:"status" bson:"status"`
 	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 	History     []StatusLog        `json:"history" bson:"history"`

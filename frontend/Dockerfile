@@ -3,8 +3,13 @@ FROM public.ecr.aws/docker/library/node:18-alpine as build-stage
 
 WORKDIR /app
 
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
-RUN npm install
+
+# Use BuildKit cache mount to cache npm packages and speed up install
+# Use npm ci for faster, reliable installs from lockfile
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 RUN npm run build

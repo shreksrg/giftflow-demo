@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../components/Login.vue'
 import GiftList from '../components/GiftList.vue'
 import Dashboard from '../components/Dashboard.vue'
+import GiftManagement from '../components/GiftManagement.vue'
 
 const routes = [
   {
@@ -23,6 +24,12 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/gift-management',
+    name: 'GiftManagement',
+    component: GiftManagement,
     meta: { requiresAuth: true }
   }
 ]

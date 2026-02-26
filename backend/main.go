@@ -1,9 +1,9 @@
 package main
 
 import (
-	"giftFlow/config"
-	"giftFlow/handlers"
-	"giftFlow/middleware"
+	"giftflow/config"
+	"giftflow/handlers"
+	"giftflow/middleware"
 	"log"
 	"os"
 
@@ -18,6 +18,10 @@ func main() {
 	seedMockData()
 
 	r := gin.Default()
+
+	// Serve static files
+	os.MkdirAll("./uploads", 0755)
+	r.Static("/uploads", "./uploads")
 
 	// CORS Middleware
 	r.Use(func(c *gin.Context) {
@@ -45,6 +49,10 @@ func main() {
 	{
 		api.GET("/me", handlers.GetMe)
 		api.GET("/gifts", handlers.GetGifts)
+		api.POST("/gifts", handlers.CreateGift)
+		api.PUT("/gifts/:id", handlers.UpdateGift)
+		api.DELETE("/gifts/:id", handlers.DeleteGift)
+		api.POST("/upload", handlers.UploadGiftImage)
 		api.POST("/applications", handlers.CreateApplication)
 		api.GET("/applications", handlers.GetApplications)
 		api.PUT("/applications/:id/status", handlers.UpdateApplicationStatus)

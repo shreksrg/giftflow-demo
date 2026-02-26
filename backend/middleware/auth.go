@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"giftFlow/models"
+	"giftflow/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

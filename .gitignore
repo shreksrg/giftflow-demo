@@ -1,0 +1,23 @@
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# Temporary/Backup files
+docker-compose-copy.yml
+*~
+*.bak
+
+# Data dumps
+*.dump
