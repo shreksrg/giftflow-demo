@@ -33,7 +33,7 @@ const loginAs = async (mockUser) => {
 </script>
 
 <template>
-  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md mx-auto">
     <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">GiftFlow Login</h1>
     <p class="mb-4 text-gray-600 text-center">Select a role to simulate login:</p>
     

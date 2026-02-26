@@ -44,11 +44,11 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navbar shows only when logged in -->
     <Navbar v-if="user" :user="user" @logout="handleLogout" />
     
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main class="flex-grow w-full max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" :class="{ 'flex items-center justify-center': !user }">
       <!-- 
         We use router-view to render the current page component.
         We pass 'user' prop to all components (Dashboard, GiftList need it).
