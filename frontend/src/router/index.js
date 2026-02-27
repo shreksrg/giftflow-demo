@@ -12,25 +12,26 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: { title: 'Login' }
   },
   {
     path: '/gifts',
     name: 'GiftList',
     component: GiftList,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, title: 'Gifts' }
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, title: 'Dashboard' }
   },
   {
     path: '/gift-management',
     name: 'GiftManagement',
     component: GiftManagement,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, title: 'Gift Management' }
   }
 ]
 
@@ -55,6 +56,20 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+})
+
+router.afterEach((to) => {
+  const baseTitle = 'GiftFlow'
+  let suffix = to.meta?.title || ''
+
+  if (to.name === 'Dashboard') {
+    const userStr = localStorage.getItem('user')
+    const user = userStr ? JSON.parse(userStr) : null
+    if (user?.role === 'DEPT_ADMIN') suffix = 'My Applications'
+    else if (user) suffix = 'Approvals'
+  }
+
+  document.title = suffix ? `${baseTitle}-${suffix}` : baseTitle
 })
 
 export default router
