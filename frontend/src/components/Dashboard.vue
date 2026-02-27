@@ -140,7 +140,6 @@ const statusClass = (status) => {
           <select v-model="searchFilters.status" id="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
             <option value="">All Statuses</option>
             <option value="PENDING_HEAD">Pending Head</option>
-            <option value="APPROVED_HEAD">Approved Head</option>
             <option value="PENDING_CPRO">Pending CPRO</option>
             <option value="APPROVED_CPRO">Approved CPRO</option>
             <option value="REJECT_HEAD">Rejected Head</option>
