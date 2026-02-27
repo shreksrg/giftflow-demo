@@ -18,6 +18,14 @@ const form = ref({
 })
 const selectedFile = ref(null)
 
+const showImageModal = ref(false)
+const selectedImage = ref('')
+
+const openImageModal = (url) => {
+  selectedImage.value = url
+  showImageModal.value = true
+}
+
 const fetchGifts = async () => {
   loading.value = true
   try {
@@ -109,7 +117,12 @@ const deleteGift = async (id) => {
       <div class="sm:hidden space-y-4">
         <div v-for="gift in gifts" :key="gift.id" class="bg-white shadow rounded-lg border border-gray-200 p-4">
           <div class="flex items-start gap-3">
-            <img :src="gift.imageUrl" class="h-14 w-14 object-cover rounded bg-gray-100 flex-none" alt="">
+            <img 
+              :src="gift.imageUrl" 
+              class="h-14 w-14 object-cover rounded bg-gray-100 flex-none cursor-zoom-in" 
+              alt=""
+              @click="openImageModal(gift.imageUrl)"
+            >
             <div class="min-w-0 flex-1">
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
@@ -163,7 +176,12 @@ const deleteGift = async (id) => {
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-for="gift in gifts" :key="gift.id">
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <img :src="gift.imageUrl" class="h-10 w-10 object-cover rounded bg-gray-100" alt="">
+                      <img 
+                        :src="gift.imageUrl" 
+                        class="h-10 w-10 object-cover rounded bg-gray-100 cursor-zoom-in" 
+                        alt=""
+                        @click="openImageModal(gift.imageUrl)"
+                      >
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ gift.name }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -257,6 +275,19 @@ const deleteGift = async (id) => {
             </form>
           </div>
         </div>
+      </div>
+    </div>
+    <div v-if="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4" @click.self="showImageModal = false">
+      <div class="relative max-w-4xl max-h-[90vh] w-full flex items-center justify-center">
+        <button 
+          @click="showImageModal = false"
+          class="absolute -top-10 right-0 text-white hover:text-gray-300 focus:outline-none"
+        >
+          <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <img :src="selectedImage" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-xl" alt="Enlarged view">
       </div>
     </div>
   </div>
