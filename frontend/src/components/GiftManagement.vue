@@ -17,6 +17,7 @@ const form = ref({
   isPublished: false
 })
 const selectedFile = ref(null)
+const previewUrl = ref('')
 
 const showImageModal = ref(false)
 const selectedImage = ref('')
@@ -44,6 +45,7 @@ const openAddModal = () => {
   isEditing.value = false
   form.value = { name: '', description: '', type: 'NORMAL', quantity: 0, imageUrl: '', isPublished: false }
   selectedFile.value = null
+  previewUrl.value = ''
   showModal.value = true
 }
 
@@ -51,11 +53,16 @@ const openEditModal = (gift) => {
   isEditing.value = true
   form.value = { ...gift, isPublished: gift.isPublished || false }
   selectedFile.value = null
+  previewUrl.value = gift.imageUrl
   showModal.value = true
 }
 
 const handleFileChange = (e) => {
-  selectedFile.value = e.target.files[0]
+  const file = e.target.files[0]
+  if (file) {
+    selectedFile.value = file
+    previewUrl.value = URL.createObjectURL(file)
+  }
 }
 
 const submitForm = async () => {
@@ -259,9 +266,9 @@ const deleteGift = async (id) => {
               <div>
                 <label class="block text-sm font-medium text-gray-700">Image</label>
                 <input type="file" @change="handleFileChange" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                <div v-if="form.imageUrl" class="mt-2">
-                  <p class="text-xs text-gray-500 mb-1">Current Image:</p>
-                  <img :src="form.imageUrl" class="h-20 w-auto rounded object-cover">
+                <div v-if="previewUrl" class="mt-2">
+                  <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                  <img :src="previewUrl" class="h-32 w-auto rounded object-contain border border-gray-200">
                 </div>
               </div>
               <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
