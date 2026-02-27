@@ -122,11 +122,11 @@ const statusClass = (status) => {
 
 <template>
   <div class="px-4 py-6 sm:px-0">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col gap-3 mb-6 sm:flex-row sm:justify-between sm:items-center">
       <h2 class="text-2xl font-bold text-gray-900">
         {{ user.role === 'DEPT_ADMIN' ? 'My Applications' : 'Approvals Dashboard' }}
       </h2>
-      <button @click="fetchApplications(currentPage)" class="text-sm text-indigo-600 hover:text-indigo-900">
+      <button @click="fetchApplications(currentPage)" class="text-sm text-indigo-600 hover:text-indigo-900 self-start sm:self-auto">
         Refresh
       </button>
     </div>
@@ -156,18 +156,18 @@ const statusClass = (status) => {
         <!-- Date Range -->
         <div class="sm:col-span-2">
           <label class="block text-sm font-medium text-gray-700">Date Range</label>
-          <div class="flex space-x-2 mt-1">
+          <div class="flex flex-col gap-2 mt-1 sm:flex-row sm:items-center sm:gap-0 sm:space-x-2">
             <input type="date" v-model="searchFilters.startDate" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-            <span class="text-gray-500 self-center">-</span>
+            <span class="hidden sm:inline text-gray-500 self-center">-</span>
             <input type="date" v-model="searchFilters.endDate" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
           </div>
         </div>
       </div>
-      <div class="mt-4 flex justify-end">
-        <button @click="fetchApplications(1)" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-0">
+        <button @click="fetchApplications(1)" class="w-full sm:w-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           Search
         </button>
-        <button @click="resetSearch" class="ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <button @click="resetSearch" class="w-full sm:w-auto sm:ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           Reset
         </button>
       </div>
@@ -175,7 +175,7 @@ const statusClass = (status) => {
 
     <!-- View Toggle for Dept Head and CPRO Admin -->
     <div v-if="user.role === 'DEPT_HEAD' || user.role === 'CPRO_ADMIN'" class="mb-4 border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+      <nav class="-mb-px flex flex-nowrap space-x-6 overflow-x-auto" aria-label="Tabs">
         <button
           @click="setView('pending')"
           :class="[
@@ -203,127 +203,195 @@ const statusClass = (status) => {
 
     <div v-if="loading" class="text-center py-10">Loading...</div>
     
-    <div v-else class="flex flex-col">
-      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Application ID
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Image
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Gift
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Quantity
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th v-if="user.role !== 'DEPT_ADMIN'" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Applicant
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Comment
-                  </th>
-                  <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="app in applications" :key="app.id">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ app.id.substring(0, 8) }}...
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <img 
-                      v-if="app.imageUrl" 
-                      :src="app.imageUrl" 
-                      alt="Gift Image" 
-                      class="h-10 w-10 rounded-full object-cover cursor-pointer hover:opacity-75"
-                      @click="selectedImage = app.imageUrl"
-                    >
-                    <span v-else class="text-gray-400 text-xs">No Img</span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ app.giftName }}</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ app.quantity || 1 }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', statusClass(app.status)]">
-                      {{ app.status }}
-                    </span>
-                  </td>
-                  <td v-if="user.role !== 'DEPT_ADMIN'" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ app.applicantId }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ new Date(app.createdAt).toLocaleDateString() }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate" :title="app.history && app.history.length > 0 ? app.history[app.history.length - 1].comment : ''">
-                    {{ (app.history && app.history.length > 0 && app.history[app.history.length - 1].comment) ? app.history[app.history.length - 1].comment : '--' }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div v-if="canApprove(app)" class="flex justify-end space-x-2">
-                      <button 
-                        @click="updateStatus(app, 'APPROVE')"
-                        class="text-green-600 hover:text-green-900"
+    <div v-else>
+      <div class="sm:hidden space-y-4">
+        <div v-for="app in applications" :key="app.id" class="bg-white shadow rounded-lg border border-gray-200 p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-gray-900 truncate">{{ app.giftName }}</div>
+              <div class="mt-1 text-xs text-gray-500">ID: {{ app.id.substring(0, 8) }}...</div>
+            </div>
+            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', statusClass(app.status)]">
+              {{ app.status }}
+            </span>
+          </div>
+
+          <div class="mt-3 flex items-center gap-3">
+            <img
+              v-if="app.imageUrl"
+              :src="app.imageUrl"
+              alt="Gift Image"
+              class="h-12 w-12 rounded object-cover flex-none cursor-pointer"
+              @click="selectedImage = app.imageUrl"
+            >
+            <div v-else class="h-12 w-12 rounded bg-gray-100 flex items-center justify-center text-xs text-gray-400 flex-none">
+              No Img
+            </div>
+            <div class="text-sm text-gray-600">
+              <div>Qty: {{ app.quantity || 1 }}</div>
+              <div>Date: {{ new Date(app.createdAt).toLocaleDateString() }}</div>
+              <div v-if="user.role !== 'DEPT_ADMIN'">Applicant: {{ app.applicantId }}</div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <div class="text-xs text-gray-500">Last Comment</div>
+            <div class="text-sm text-gray-700 break-words">
+              {{ (app.history && app.history.length > 0 && app.history[app.history.length - 1].comment) ? app.history[app.history.length - 1].comment : '--' }}
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div v-if="canApprove(app)" class="grid grid-cols-2 gap-2">
+              <button
+                @click="updateStatus(app, 'APPROVE')"
+                class="inline-flex justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Approve
+              </button>
+              <button
+                @click="updateStatus(app, 'REJECT')"
+                class="inline-flex justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Reject
+              </button>
+            </div>
+            <button
+              v-else
+              @click="selectedApp = app"
+              class="w-full inline-flex justify-center px-3 py-2 rounded-md text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {{ ['COMPLETED', 'REJECT_HEAD', 'REJECT_CPRO', 'APPROVED_CPRO'].includes(app.status) ? 'Done' : 'Pending' }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="applications.length === 0" class="text-center text-gray-500 py-10">
+          No applications found.
+        </div>
+      </div>
+
+      <div class="hidden sm:flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Application ID
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Image
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Gift
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Quantity
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th v-if="user.role !== 'DEPT_ADMIN'" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Applicant
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Last Comment
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                      <span class="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="app in applications" :key="app.id">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ app.id.substring(0, 8) }}...
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <img 
+                        v-if="app.imageUrl" 
+                        :src="app.imageUrl" 
+                        alt="Gift Image" 
+                        class="h-10 w-10 rounded-full object-cover cursor-pointer hover:opacity-75"
+                        @click="selectedImage = app.imageUrl"
                       >
-                        Approve
-                      </button>
-                      <button 
-                        @click="updateStatus(app, 'REJECT')"
-                        class="text-red-600 hover:text-red-900"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                    <div v-else class="text-gray-400 italic text-xs">
-                      <button @click="selectedApp = app" class="hover:text-indigo-600 hover:underline focus:outline-none">
-                        {{ ['COMPLETED', 'REJECT_HEAD', 'REJECT_CPRO', 'APPROVED_CPRO'].includes(app.status) ? 'Done' : 'Pending' }}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="applications.length === 0">
-                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                    No applications found.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      <span v-else class="text-gray-400 text-xs">No Img</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">{{ app.giftName }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ app.quantity || 1 }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', statusClass(app.status)]">
+                        {{ app.status }}
+                      </span>
+                    </td>
+                    <td v-if="user.role !== 'DEPT_ADMIN'" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ app.applicantId }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ new Date(app.createdAt).toLocaleDateString() }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate" :title="app.history && app.history.length > 0 ? app.history[app.history.length - 1].comment : ''">
+                      {{ (app.history && app.history.length > 0 && app.history[app.history.length - 1].comment) ? app.history[app.history.length - 1].comment : '--' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div v-if="canApprove(app)" class="flex justify-end space-x-2">
+                        <button 
+                          @click="updateStatus(app, 'APPROVE')"
+                          class="text-green-600 hover:text-green-900"
+                        >
+                          Approve
+                        </button>
+                        <button 
+                          @click="updateStatus(app, 'REJECT')"
+                          class="text-red-600 hover:text-red-900"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                      <div v-else class="text-gray-400 italic text-xs">
+                        <button @click="selectedApp = app" class="hover:text-indigo-600 hover:underline focus:outline-none">
+                          {{ ['COMPLETED', 'REJECT_HEAD', 'REJECT_CPRO', 'APPROVED_CPRO'].includes(app.status) ? 'Done' : 'Pending' }}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="applications.length === 0">
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                      No applications found.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-      
-      <!-- Pagination -->
-      <div v-if="!loading && totalPages > 1" class="mt-4 flex justify-between items-center">
+
+      <div v-if="!loading && totalPages > 1" class="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <span class="text-sm text-gray-700">
           Page {{ currentPage }} of {{ totalPages }}
         </span>
-        <div class="space-x-2">
+        <div class="flex gap-2 sm:gap-0 sm:space-x-2">
           <button 
             @click="fetchApplications(currentPage - 1)" 
             :disabled="currentPage === 1"
-            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             Previous
           </button>
           <button 
             @click="fetchApplications(currentPage + 1)" 
             :disabled="currentPage === totalPages"
-            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             Next
           </button>

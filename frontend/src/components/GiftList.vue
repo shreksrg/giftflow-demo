@@ -77,9 +77,9 @@ const confirmApplication = async () => {
 
 <template>
   <div class="px-4 py-6 sm:px-0">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col gap-3 mb-6 sm:flex-row sm:justify-between sm:items-center">
       <h2 class="text-2xl font-bold text-gray-900">Available Gifts</h2>
-      <div v-if="successMsg" class="bg-green-100 text-green-800 px-4 py-2 rounded-md transition-all">
+      <div v-if="successMsg" class="bg-green-100 text-green-800 px-4 py-2 rounded-md transition-all sm:self-auto self-start">
         {{ successMsg }}
       </div>
     </div>
@@ -106,20 +106,20 @@ const confirmApplication = async () => {
         <div class="p-4 flex-1 flex flex-col">
           <h3 class="text-lg font-medium text-gray-900 truncate">{{ gift.name }}</h3>
           <p class="mt-1 text-sm text-gray-500 flex-1">{{ gift.description }}</p>
-          <div class="mt-4 flex items-center justify-between">
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
             <span class="text-sm text-gray-500">Stock: {{ gift.quantity }}</span>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center gap-2">
               <input 
                 type="number" 
                 v-model.number="gift.selectedQuantity" 
                 min="1" 
                 :max="gift.quantity"
-                class="w-16 border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500 p-1"
+                class="w-20 h-10 border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500 px-2"
               >
               <button 
                 @click="applyForGift(gift)"
                 :disabled="applying === gift.id || gift.quantity <= 0"
-                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                class="flex-1 sm:flex-none inline-flex justify-center items-center px-4 h-10 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
                 {{ applying === gift.id ? 'Applying...' : 'Apply' }}
               </button>
@@ -130,11 +130,11 @@ const confirmApplication = async () => {
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && totalPages > 1" class="mt-6 flex justify-center items-center space-x-2">
+    <div v-if="!loading && totalPages > 1" class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center sm:items-center sm:gap-0 sm:space-x-2">
       <button 
         @click="fetchGifts(currentPage - 1)" 
         :disabled="currentPage === 1"
-        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Previous
       </button>
@@ -144,7 +144,7 @@ const confirmApplication = async () => {
       <button 
         @click="fetchGifts(currentPage + 1)" 
         :disabled="currentPage === totalPages"
-        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Next
       </button>
