@@ -1,33 +1,18 @@
 
 services:
- 
-  # 开发模式：热重载（无需重建镜像）
-  backend-dev:
-    image: public.ecr.aws/docker/library/golang:1.26-alpine
-    container_name: giftflow-backend-dev
-    working_dir: /app
-    command: >
-      sh -lc "
-      apk add --no-cache git ca-certificates &&
-      export PATH=/usr/local/go/bin:/go/bin:$PATH &&
-      /usr/local/go/bin/go env -w GOPROXY=https://proxy.golang.org,direct &&
-      /usr/local/go/bin/go install github.com/air-verse/air@latest &&
-      /go/bin/air
-      "
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: giftflow-backend
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend:/app
-      - go-mod-cache:/go/pkg/mod
-      - go-build-cache:/root/.cache/go-build
     environment:
       - MONGO_URI=mongodb://mongo:27017
       - PORT=8080
     depends_on:
       mongo:
         condition: service_healthy
-    # 可选：只在 dev 配置文件/配置文件 profile 下启用
-    
 
   frontend:
     build: ./frontend
@@ -35,7 +20,7 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend-dev
+      - backend
 
   mongo:
     image: mongo:6.0
@@ -50,5 +35,6 @@ services:
       retries: 5
 
 volumes:
+  mongo-data:
   go-mod-cache:
   go-build-cache:

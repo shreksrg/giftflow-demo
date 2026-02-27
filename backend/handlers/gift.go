@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,28 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+func publicBaseURL(c *gin.Context) string {
+	if v := strings.TrimSpace(os.Getenv("PUBLIC_BASE_URL")); v != "" {
+		return strings.TrimRight(v, "/")
+	}
+
+	proto := c.GetHeader("X-Forwarded-Proto")
+	if proto == "" {
+		if c.Request.TLS != nil {
+			proto = "https"
+		} else {
+			proto = "http"
+		}
+	}
+
+	host := c.Request.Host
+	if host == "" {
+		host = c.Request.URL.Host
+	}
+
+	return fmt.Sprintf("%s://%s", proto, host)
+}
 
 // GetGifts returns list of gifts
 func GetGifts(c *gin.Context) {
@@ -183,6 +206,6 @@ func UploadGiftImage(c *gin.Context) {
 		return
 	}
 
-	url := fmt.Sprintf("http://127.0.0.1:8080/uploads/%s", filename)
+	url := fmt.Sprintf("%s/uploads/%s", publicBaseURL(c), filename)
 	c.JSON(http.StatusOK, gin.H{"url": url})
 }

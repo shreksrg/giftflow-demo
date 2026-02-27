@@ -21,7 +21,7 @@ const selectedFile = ref(null)
 const fetchGifts = async () => {
   loading.value = true
   try {
-    const res = await axios.get('http://127.0.0.1:8080/api/gifts?limit=100')
+    const res = await axios.get('/api/gifts?limit=100')
     gifts.value = res.data.data
   } catch (e) {
     alert('Failed to fetch gifts: ' + e.message)
@@ -57,7 +57,7 @@ const submitForm = async () => {
     if (selectedFile.value) {
       const formData = new FormData()
       formData.append('file', selectedFile.value)
-      const res = await axios.post('http://127.0.0.1:8080/api/upload', formData)
+      const res = await axios.post('/api/upload', formData)
       imageUrl = res.data.url
     }
 
@@ -71,9 +71,9 @@ const submitForm = async () => {
     }
 
     if (isEditing.value) {
-      await axios.put(`http://127.0.0.1:8080/api/gifts/${form.value.id}`, payload)
+      await axios.put(`/api/gifts/${form.value.id}`, payload)
     } else {
-      await axios.post('http://127.0.0.1:8080/api/gifts', payload)
+      await axios.post('/api/gifts', payload)
     }
     
     showModal.value = false
@@ -86,7 +86,7 @@ const submitForm = async () => {
 const deleteGift = async (id) => {
   if (!confirm('Are you sure you want to delete this gift?')) return
   try {
-    await axios.delete(`http://127.0.0.1:8080/api/gifts/${id}`)
+    await axios.delete(`/api/gifts/${id}`)
     fetchGifts()
   } catch (e) {
     alert('Delete failed: ' + (e.response?.data?.error || e.message))

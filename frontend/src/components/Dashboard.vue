@@ -39,7 +39,7 @@ const fetchApplications = async (page = 1) => {
       if (searchFilters.value.endDate) params.endDate = searchFilters.value.endDate
     }
 
-    const response = await axios.get('http://127.0.0.1:8080/api/applications', { params })
+    const response = await axios.get('/api/applications', { params })
     applications.value = response.data.data || []
     currentPage.value = response.data.page || 1
     totalPages.value = response.data.totalPages || 1
@@ -93,7 +93,7 @@ const confirmStatusUpdate = async () => {
   }
 
   try {
-    await axios.put(`http://127.0.0.1:8080/api/applications/${app.id}/status`, {
+    await axios.put(`/api/applications/${app.id}/status`, {
       status: action === 'REJECT' ? 'REJECTED' : 'APPROVED',
       comment
     })

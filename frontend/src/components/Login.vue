@@ -21,7 +21,7 @@ const loginAs = async (mockUser) => {
     // We set a global axios interceptor to inject the user header
     axios.defaults.headers.common['X-Mock-User'] = mockUser.username
     
-    const response = await axios.get('http://127.0.0.1:8080/api/me')
+    const response = await axios.get('/api/me')
     emit('login', response.data)
   } catch (err) {
     console.error(err)
